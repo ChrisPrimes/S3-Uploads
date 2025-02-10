@@ -18,18 +18,24 @@ jobs:
         php-version: '7.4'
         coverage: pcov
         tools: composer
+
+    - name: Copy archive
+      run: mkdir -p build/$PLUGIN_SLUG; git archive HEAD | tar -x -C build/$PLUGIN_SLUG
     
     - name: Install dependencies
-      run: composer install
+      run: composer install --working-dir=./build/$PLUGIN_SLUG
 
     - name: Install zip utility
       run: sudo apt-get install -y zip
 
     - name: Debug log
-      run: ls -la
+      run: ls -la build
+
+    - name: Debug log
+      run: ls -la build/$PLUGIN_SLUG
 
     - name: Build zip archive
-      run: zip -vr $ZIP_NAME .
+      run: zip -vr build/$ZIP_NAME build/$PLUGIN_SLUG
 
     - name: Debug log
       run: ls -la
