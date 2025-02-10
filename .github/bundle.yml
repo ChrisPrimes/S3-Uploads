@@ -1,0 +1,39 @@
+name: Bundle plugin
+
+on: workflow_dispatch
+
+env:
+  PLUGIN_SLUG: ${{ github.event.repository.name }}
+  ZIP_NAME: ${{ github.event.repository.name }}.zip
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        tools: composer
+    
+    - name: Install dependencies
+      run: composer install
+
+    - name: Install zip utility
+      run: sudo apt-get install -y zip
+
+    - name: Debug log
+      run: ls -la build
+
+    - name: Build zip archive
+      run: zip -vr $ZIP_NAME .
+
+    - name: Debug log
+      run: ls -la
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PLUGIN_SLUG }}
+        path: ${{ env.ZIP_NAME }}
