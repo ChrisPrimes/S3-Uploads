@@ -30,7 +30,7 @@ jobs:
         run: sudo apt-get install -y zip
 
       - name: Build zip archive
-        run: zip -r build/$ZIP_NAME build/$PLUGIN_SLUG/*
+        run: cd build/$PLUGIN_SLUG && zip -r ../$ZIP_NAME .
 
       - uses: actions/upload-artifact@v4
         with:
