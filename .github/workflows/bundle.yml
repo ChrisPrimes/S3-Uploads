@@ -3,44 +3,36 @@ name: Bundle plugin
 on: workflow_dispatch
 
 env:
-  PLUGIN_SLUG: ${{ github.event.repository.name }}
-  ZIP_NAME: ${{ github.event.repository.name }}.zip
+  PLUGIN_SLUG: "s3-uploads"
+  ZIP_NAME: "s3-uploads.zip"
 
 jobs:
   bundle:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-        coverage: pcov
-        tools: composer
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          coverage: pcov
+          tools: composer
 
-    - name: Copy archive
-      run: mkdir -p build/$PLUGIN_SLUG; git archive HEAD | tar -x -C build/$PLUGIN_SLUG
-    
-    - name: Install dependencies
-      run: composer install --working-dir=./build/$PLUGIN_SLUG
+      - name: Copy archive
+        run: mkdir -p build/$PLUGIN_SLUG &&
+          git archive HEAD | tar -x -C build/$PLUGIN_SLUG
 
-    - name: Install zip utility
-      run: sudo apt-get install -y zip
+      - name: Install dependencies
+        run: composer install --working-dir=./build/$PLUGIN_SLUG
 
-    - name: Debug log
-      run: ls -la build
+      - name: Install zip utility
+        run: sudo apt-get install -y zip
 
-    - name: Debug log
-      run: ls -la build/$PLUGIN_SLUG
+      - name: Build zip archive
+        run: cd build && zip -vr $ZIP_NAME $PLUGIN_SLUG
 
-    - name: Build zip archive
-      run: cd build && zip -vr $ZIP_NAME $PLUGIN_SLUG
-
-    - name: Debug log
-      run: ls -la
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.ZIP_NAME }}
-        path: build/${{ env.ZIP_NAME }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ZIP_NAME }}
+          path: build/${{ env.ZIP_NAME }}
